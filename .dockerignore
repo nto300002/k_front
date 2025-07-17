@@ -1,0 +1,15 @@
+# k_front/.dockerignore
+
+# 依存関係（コンテナ内でインストールするため不要）
+node_modules
+
+# Next.jsのビルド成果物（コンテナ内でビルドするため不要）
+.next
+
+# Docker関連
+Dockerfile
+
+# その他
+.DS_Store
+npm-debug.log
+README.md
