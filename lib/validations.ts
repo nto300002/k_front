@@ -46,5 +46,18 @@ export const signUpSchema = z
     path: ["repeatPassword"],
   });
 
+export const officeSetupSchema = z.object({
+  name: z
+    .string()
+    .min(1, "事業所名を入力してください")
+    .max(100, "事業所名は100文字以下である必要があります"),
+  office_type: z.enum([
+    "transition_to_employment",
+    "type_A_office",
+    "type_B_office",
+  ]),
+});
+
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type SignUpFormData = z.infer<typeof signUpSchema>;
+export type OfficeSetupFormData = z.infer<typeof officeSetupSchema>;
