@@ -12,10 +12,17 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpSchema, type SignUpFormData } from "@/lib/validations";
 
@@ -29,6 +36,7 @@ export function SignUpForm({
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -44,6 +52,10 @@ export function SignUpForm({
         password: data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/protected`,
+          data: {
+            name: data.name,
+            role: data.role,
+          },
         },
       });
       if (error) throw error;
@@ -88,6 +100,29 @@ export function SignUpForm({
                 )}
               </div>
               <div className="grid gap-2">
+                <Label htmlFor="role">Role</Label>
+                <Controller
+                  control={control}
+                  name="role"
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="employee">Employee</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.role && (
+                  <p className="text-sm text-red-500">
+                    {errors.role.message}
+                  </p>
+                )}
+              </div>
+              <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
@@ -97,7 +132,9 @@ export function SignUpForm({
                   {...register("password")}
                 />
                 {errors.password && (
-                  <p className="text-sm text-red-500">{errors.password.message}</p>
+                  <p className="text-sm text-red-500">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
               <div className="grid gap-2">
@@ -110,7 +147,9 @@ export function SignUpForm({
                   {...register("repeatPassword")}
                 />
                 {errors.repeatPassword && (
-                  <p className="text-sm text-red-500">{errors.repeatPassword.message}</p>
+                  <p className="text-sm text-red-500">
+                    {errors.repeatPassword.message}
+                  </p>
                 )}
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
