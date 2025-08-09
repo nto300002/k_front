@@ -12,21 +12,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signUpSchema, type SignUpFormData } from "@/lib/validations";
+import { AdminSignUpSchema, type AdminSignUpFormData } from "@/lib/validations";
 
-export function SignUpForm({
+export function AdminSignupForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
@@ -36,13 +29,12 @@ export function SignUpForm({
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors, isSubmitting },
-  } = useForm<SignUpFormData>({
-    resolver: zodResolver(signUpSchema),
+  } = useForm<AdminSignUpFormData>({
+    resolver: zodResolver(AdminSignUpSchema),
   });
 
-  const onSubmit = async (data: SignUpFormData) => {
+  const onSubmit = async (data: AdminSignUpFormData) => {
     const supabase = createClient();
     setError(null);
 
@@ -51,15 +43,15 @@ export function SignUpForm({
         email: data.email,
         password: data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}/auth/admin/login`,
           data: {
             name: data.name,
-            role: data.role,
+            role: "service_administrator",
           },
         },
       });
       if (error) throw error;
-      router.push("/auth/sign-up-success");
+      router.push("/auth/admin/login");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     }
@@ -69,8 +61,8 @@ export function SignUpForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>アカウントを作成します</CardDescription>
+          <CardTitle className="text-2xl">管理者アカウント作成</CardTitle>
+          <CardDescription>管理者アカウントを作成します</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -100,29 +92,6 @@ export function SignUpForm({
                 )}
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="role">Role</Label>
-                <Controller
-                  control={control}
-                  name="role"
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="employee">Employee</SelectItem>
-                        <SelectItem value="manager">Manager</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.role && (
-                  <p className="text-sm text-red-500">
-                    {errors.role.message}
-                  </p>
-                )}
-              </div>
-              <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
@@ -132,9 +101,7 @@ export function SignUpForm({
                   {...register("password")}
                 />
                 {errors.password && (
-                  <p className="text-sm text-red-500">
-                    {errors.password.message}
-                  </p>
+                  <p className="text-sm text-red-500">{errors.password.message}</p>
                 )}
               </div>
               <div className="grid gap-2">
@@ -147,20 +114,18 @@ export function SignUpForm({
                   {...register("repeatPassword")}
                 />
                 {errors.repeatPassword && (
-                  <p className="text-sm text-red-500">
-                    {errors.repeatPassword.message}
-                  </p>
+                  <p className="text-sm text-red-500">{errors.repeatPassword.message}</p>
                 )}
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "アカウント作成中..." : "Sign up"}
+                {isSubmitting ? "アカウント作成中..." : "管理者アカウント作成"}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              アカウントを持っていない場合{" "}
-              <Link href="/auth/login" className="underline underline-offset-4">
-                Login
+              既にアカウントをお持ちの場合{" "}
+              <Link href="/auth/admin/login" className="underline underline-offset-4">
+                ログイン
               </Link>
             </div>
           </form>
